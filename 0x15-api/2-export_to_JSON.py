@@ -2,9 +2,10 @@
 """
 A Python script that, using this REST API, for a given employee ID,
 returns information about his/her TODO list progress and
-export data in the CSV format.
+export data in the JSON format.
 """
 
+import json
 import requests
 from sys import argv
 
@@ -21,8 +22,13 @@ if __name__ == '__main__':
     response = requests.get(todoUrl)
     tasks = response.json()
 
-    with open('{}.csv'.format(eid), 'w') as f:
-        for task in tasks:
-            f.write('"{}","{}","{}","{}"\n'
-                    .format(eid, uname, task.get('completed'),
-                            task.get('title')))
+    dic = {eid: []}
+    for task in tasks:
+        dic[eid].append({
+            "task": task.get('title'),
+            "completed": task.get('completed'),
+            "username": uname
+        })
+
+    with open('{}.json'.format(eid), 'w') as f:
+        json.dump(dic, f)
